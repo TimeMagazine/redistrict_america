@@ -1,0 +1,16 @@
+{
+    "name": "redistrict_america",
+    "version": "0.0.1",
+    "description": "",
+    "repository": {},
+    "dependencies": {
+        "browserify": ">= 4.1.6",
+        "node-lessify": ">= 0.0.1",
+        "node-csvify": ">= 0.0.1",
+        "node-underscorify": "0.0.7"
+    },
+    "scripts" : {},
+    "browserify": {
+        "transform": ["node-lessify", "node-underscorify", "node-csvify"]
+    }
+}
