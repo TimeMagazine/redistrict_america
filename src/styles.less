@@ -1,6 +1,124 @@
 #redistrict_america.time-interactive {
-	path {
-		fill: #CCC;
-		cursor: default;
-	}	
+	background-color: black;
+	max-width: 1200px;
+	width: 100%;
+	text-align: right;
+	position: relative;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;	
+
+	.interactive-head {
+		color: white;
+		font-weight: 100;
+		font-size: 30px;
+		letter-spacing: 6px;
+		padding-top: 8px;
+		text-align: center;
+		span {
+			border-bottom: 3px solid white;			
+		}
+	}
+
+	.interactive-intro {
+		padding-top: 8px;
+		color: white;
+		text-align: center;
+	}
+
+	.border {
+		stroke-width: 1px;
+		stroke: white;
+		fill: black;	
+	}
+
+	#usmap {
+		text-align: right;
+
+		svg {
+			display: inline-block;
+		}
+	}
+
+	.county {
+		stroke: #FFF;
+		stroke-width: 0.5px;
+		stroke-opacity: 0.2;
+		fill: black;
+		fill-opacity: 0.01;		
+	}
+
+	.over {
+		fill: #FFF;
+		stroke: black;
+		fill-opacity: 1;
+	}
+
+	.stats {
+		color: white;
+		position: absolute;
+		left: 0;
+		top: 25%;
+		font-size: 20px;
+		font-weight: 100;
+		height: 300px;
+		width: 30%;
+		text-align: left;
+		padding: 20px;
+
+
+		background: -moz-linear-gradient(0deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%); /* ff3.6+ */
+		background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(255,255,255,0.4)), color-stop(100%, rgba(255,255,255,0))); /* safari4+,chrome */
+		background: -webkit-linear-gradient(0deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%); /* safari5.1+,chrome10+ */
+		background: -o-linear-gradient(0deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%); /* opera 11.10+ */
+		background: -ms-linear-gradient(0deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%); /* ie10+ */
+		background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%); /* w3c */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); /* ie6-9 */	
+
+		.stat_field	{
+			> div {
+				line-height: 40px;
+				vertical-align: top;
+				margin-left: 20px;				
+			}
+
+			.field_name {
+				display: inline-block;
+				font-size: 14px;
+				letter-spacing: 3px;
+			}
+
+			.field_value {
+				display: inline-block;
+				font-size: 30px;
+			}
+		}
+	}
+
+	.control {
+		text-align: right;
+
+		button {
+			border-radius: 0;
+			background-color: black;
+			border: 1px solid white;
+			color: white;
+			cursor: pointer;
+			margin: 10px;
+			padding: 4px 10px;
+		}
+	}
+
+	/*
+	.right {
+		text-align: right;
+		right: 0;
+		left: auto;
+	}
+	*/
 }
