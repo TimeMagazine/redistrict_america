@@ -4,8 +4,13 @@
 		d3 = require('d3'),
 		topojson = require("topojson"),
 		helper = require("./src/topojson.helper.js"),
-		cb = require("colorbrewer");
-
+		cb = require("./node_modules/colorbrewer/colorbrewer.js");
+		countyData = require('./data/files/cleanedCounties.csv');
+		countyJSON = {};
+		countyData.forEach(function(dat,ind){
+			countyJSON[dat.FIPS] = dat;
+		});
+		console.log(countyJSON);
 	//CSS
 	require("./src/styles.less");
 
@@ -28,7 +33,7 @@
 
     // connect data to counties
     counties.forEach(function(county, i) {
-    	county.data = data[county.id]; delete data[county.id];
+    	county.data = countyJSON[county.id]; delete countyJSON[county.id];
     	county.properties.neighbors = neighbors[i];
     	county.properties.state = county.properties.original_state = county.id.slice(0,2); // get state from two-digit abbrev in fips code 
     	index[county.id] = county.properties.state;
@@ -106,7 +111,7 @@
 			if (name && name !== "") {
 				var new_id = next_state + 100; next_state += 1;			
 				d.properties.state = new_id;
-				d.data.state = name;
+				d.data.STATE = name;
 				moveCounty(this, d, d);
 		    	updateBorders();
 
@@ -119,18 +124,36 @@
 		});
 
 	function fillConsole(st) {
-		$("#stname").html(st.data.state.toUpperCase());
+		$("#stname").html(st.data.STATE.split(", ")[1].toUpperCase());
 		$("#stat_fields").empty();
 		$(stat_field({
 			name: "POPULATION",
 			value: time.commafy(getPop(st.properties.state)),
 			border_color: "pink"
 		})).appendTo("#stat_fields");
+		$(stat_field({
+			name: "MEDIAN INCOME",
+			value: time.commafy(Math.round(getAvg(st.properties.state,"MPE"))),
+			border_color: "pink"
+		})).appendTo("#stat_fields");
+
+		$(stat_field({
+			name: "GINI COEFF",
+			value: time.commafy(Math.round(getAvg(st.properties.state,"GINI") * 1000)/1000),
+			border_color: "pink"
+		})).appendTo("#stat_fields");
+
+		$(stat_field({
+			name: "UNEMPLOYMENT",
+			value: time.commafy(Math.round((getSum(st.properties.state,"UNEMPRATE")/getSum(st.properties.state,"TOTALPOP")) * 100000) / 1000),
+			border_color: "pink"
+		})).appendTo("#stat_fields");
+
 	}
 
 	function moveCounty(obj, county, new_state) {
 		county.properties.state = new_state.properties.state;
-		county.data.state = new_state.data.state;
+		county.data.STATE = new_state.data.STATE;
 		d3.select(obj).attr("class", "over county state-" + new_state.properties.state);
 		index[county.id] = new_state.properties.state;
 		fillConsole(new_state);
@@ -169,10 +192,33 @@
     	var pop = 0;
     	counties.forEach(function(county) {
     		if (state === county.properties.state) {
-	    		pop += county.data.population;
+	    		pop += parseInt(county.data.TOTALPOP);
 	    	}
     	});
     	return pop;
+    }
+
+    function getSum(state,prop) {
+    	var pop = 0;
+    	counties.forEach(function(county) {
+    		if (state === county.properties.state) {
+	    		pop += parseFloat(county.data[prop]);
+	    	}
+    	});
+    	return pop;
+    }
+
+    function getAvg(state,prop){
+    	var mpe = 0;
+    	var count = 0;
+    	counties.forEach(function(county) {
+    		if (state === county.properties.state) {
+	    		mpe += parseFloat(county.data[prop]);
+	    		count += 1;
+	    	}
+    	});
+    	var avgMPE = mpe/count;
+    	return avgMPE;
     }
 
     $("#saveme").click(function() {
@@ -180,7 +226,7 @@
     	counties.forEach(function(county) {
     		if (!output[county.properties.state]) {
     			output[county.properties.state] = {
-    				id: county.data.state,
+    				id: county.data.STATE,
     				counties: []
     			};
     		}
