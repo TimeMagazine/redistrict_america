@@ -153,6 +153,18 @@
         })).appendTo("#stat_fields");
 
         $(stat_field({
+            name: "ROMNEY",
+            value: time.commafy(getSum(st.properties.state, "ROMNEY")),
+            border_color: "pink"
+        })).appendTo("#stat_fields");
+
+        $(stat_field({
+            name: "OBAMA",
+            value: time.commafy(getSum(st.properties.state, "OBAMA")),
+            border_color: "pink"
+        })).appendTo("#stat_fields");
+
+        $(stat_field({
             name: "POVERTY",
             value: time.commafy(getSum(st.properties.state, "POVERTY")),
             border_color: "pink"
