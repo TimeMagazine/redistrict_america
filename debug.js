@@ -33,7 +33,8 @@
 
     // connect data to counties
     counties.forEach(function(county, i) {
-    	county.data = countyJSON[county.id]; delete countyJSON[county.id];
+    	county.data = countyJSON[parseInt(county.id)]; 
+    	delete countyJSON[parseInt(county.id)];
     	county.properties.neighbors = neighbors[i];
     	county.properties.state = county.properties.original_state = county.id.slice(0,2); // get state from two-digit abbrev in fips code 
     	index[county.id] = county.properties.state;
@@ -124,6 +125,7 @@
 		});
 
 	function fillConsole(st) {
+		console.log(st);
 		$("#stname").html(st.data.STATE.split(", ")[1].toUpperCase());
 		$("#stat_fields").empty();
 		$(stat_field({
@@ -146,6 +148,18 @@
 		$(stat_field({
 			name: "UNEMPLOYMENT",
 			value: time.commafy(Math.round((getSum(st.properties.state,"UNEMPRATE")/getSum(st.properties.state,"TOTALPOP")) * 100000) / 1000),
+			border_color: "pink"
+		})).appendTo("#stat_fields");
+
+		$(stat_field({
+			name: "ELDERLY POPULATION",
+			value: time.commafy(getSum(st.properties.state,"POPGT65")),
+			border_color: "pink"
+		})).appendTo("#stat_fields");
+
+		$(stat_field({
+			name: "POVERTY",
+			value: time.commafy(getSum(st.properties.state,"POVERTY")),
 			border_color: "pink"
 		})).appendTo("#stat_fields");
 
