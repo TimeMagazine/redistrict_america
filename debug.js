@@ -3,8 +3,9 @@
         base = require("d3-base"),
         d3 = require('d3'),
         topojson = require("topojson"),
-        helper = require("./src/topojson.helper.js"),
-        cb = require("./node_modules/colorbrewer/colorbrewer.js");
+        helper = require("./src/topojson.helper.js");
+
+
     countyData = require('./data/files/cleanedCounties.csv');
     countyJSON = {};
     countyData.forEach(function(dat, ind) {
@@ -134,12 +135,14 @@
             value: time.commafy(getPop(st.properties.state)),
             border_color: "pink"
         })).appendTo("#stat_fields");
+
         $(stat_field({
             name: "MEDIAN INCOME",
             value: time.commafy(Math.round(getAvg(st.properties.state, "MPE"))),
-            border_color: "pink"
+            border_color: "green"
         })).appendTo("#stat_fields");
 
+        /*
         $(stat_field({
             name: "GINI COEFF",
             value: time.commafy(Math.round(getAvg(st.properties.state, "GINI") * 1000) / 1000),
@@ -153,53 +156,62 @@
         })).appendTo("#stat_fields");
 
         $(stat_field({
-            name: "ROMNEY",
-            value: time.commafy(getSum(st.properties.state, "ROMNEY")),
-            border_color: "pink"
-        })).appendTo("#stat_fields");
-
-        $(stat_field({
-            name: "OBAMA",
-            value: time.commafy(getSum(st.properties.state, "OBAMA")),
-            border_color: "pink"
-        })).appendTo("#stat_fields");
-
-        $(stat_field({
             name: "POVERTY",
             value: time.commafy(getSum(st.properties.state, "POVERTY")),
             border_color: "pink"
         })).appendTo("#stat_fields");
 
+        */
+
+        $(stat_field({
+            name: "ROMNEY",
+            value: Math.round(100 * getSum(st.properties.state, "ROMNEY") / (getSum(st.properties.state, "OBAMA") + getSum(st.properties.state, "ROMNEY"))) + "%",
+            border_color: "red"
+        })).appendTo("#stat_fields");
+
+        $(stat_field({
+            name: "OBAMA",
+            value: Math.round(100 * getSum(st.properties.state, "OBAMA") / (getSum(st.properties.state, "OBAMA") + getSum(st.properties.state, "ROMNEY"))) + "%",
+            border_color: "blue"
+        })).appendTo("#stat_fields");
+
         $(stat_field({
             name: "WHITE",
-            value: time.commafy(getSum(st.properties.state, "WNLPOP")),
-            border_color: "pink"
+            value: Math.round(100 * getSum(st.properties.state, "WNLPOP") / getPop(st.properties.state)) + "%",
+            border_color: "gray"
         })).appendTo("#stat_fields");
-        $(stat_field({
-            name: "NATIVE AMERICAN",
-            value: time.commafy(getSum(st.properties.state, "NAPOP")),
-            border_color: "pink"
-        })).appendTo("#stat_fields");
+
         $(stat_field({
             name: "AFRICAN AMERICAN",
-            value: time.commafy(getSum(st.properties.state, "AFAPOP")),
-            border_color: "pink"
+            value: Math.round(100 * getSum(st.properties.state, "AFAPOP") / getPop(st.properties.state)) + "%",
+            border_color: "gray"
         })).appendTo("#stat_fields");
+
+        $(stat_field({
+            name: "HISPANIC",
+            value: Math.round(100 * getSum(st.properties.state, "LATPOP") / getPop(st.properties.state)) + "%",
+            border_color: "gray"
+        })).appendTo("#stat_fields");
+
         $(stat_field({
             name: "ASIAN AMERICAN",
-            value: time.commafy(getSum(st.properties.state, "ASAPOP")),
-            border_color: "pink"
+            value: Math.round(100 * getSum(st.properties.state, "ASAPOP") / getPop(st.properties.state)) + "%",
+            border_color: "gray"
         })).appendTo("#stat_fields");
+
         $(stat_field({
-            name: "LATIN AMERICAN",
-            value: time.commafy(getSum(st.properties.state, "LATPOP")),
-            border_color: "pink"
+            name: "NATIVE AMERICAN",
+            value: Math.round(100 * getSum(st.properties.state, "NAPOP") / getPop(st.properties.state)) + "%",
+            border_color: "gray"
         })).appendTo("#stat_fields");
+
+        /*
         $(stat_field({
             name: "OTHER ETHNICITY",
             value: time.commafy(getSum(st.properties.state, "OTHERPOP")),
             border_color: "pink"
         })).appendTo("#stat_fields");
+        */
     }
 
     function moveCounty(obj, county, new_state) {
