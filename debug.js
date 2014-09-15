@@ -137,8 +137,8 @@
         })).appendTo("#stat_fields");
 
         $(stat_field({
-            name: "MEDIAN INCOME",
-            value: time.commafy(Math.round(getAvg(st.properties.state, "MPE"))),
+            name: "MEAN INCOME",
+            value: time.commafy(Math.round(getWeightedAvg(st.properties.state, "MPE"))),
             border_color: "green"
         })).appendTo("#stat_fields");
 
@@ -287,6 +287,20 @@
             }
         });
         var avgMPE = mpe / count;
+        return avgMPE;
+    }
+
+    function getWeightedAvg(state, prop) {
+        var totalPopulation = getSum(state,"TOTALPOP");
+        var mpe = 0;
+        var count = 0;
+        counties.forEach(function(county) {
+            if (state === county.properties.state) {
+                mpe += (parseFloat(county.data[prop]) * parseFloat(county.data.TOTALPOP));
+                count += 1;
+            }
+        });
+        var avgMPE = mpe / totalPopulation;
         return avgMPE;
     }
 
