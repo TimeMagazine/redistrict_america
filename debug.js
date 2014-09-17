@@ -5,13 +5,12 @@
         topojson = require("topojson"),
         helper = require("./src/topojson.helper.js");
 
-
+    var stateMaster = {};
     countyData = require('./data/files/cleanedCounties.csv');
     countyJSON = {};
     countyData.forEach(function(dat, ind) {
         countyJSON[dat.FIPS] = dat;
     });
-    console.log(countyJSON);
     //CSS
     require("./src/styles.less");
 
@@ -127,7 +126,6 @@
         });
 
     function fillConsole(st) {
-        console.log(st);
         $("#stname").html(st.data.STATE.split(", ")[1].toUpperCase());
         $("#stat_fields").empty();
         $(stat_field({
@@ -204,6 +202,12 @@
             value: Math.round(100 * getSum(st.properties.state, "NAPOP") / getPop(st.properties.state)) + "%",
             border_color: "gray"
         })).appendTo("#stat_fields");
+        console.log(stateMaster[st.properties.state]);
+        $(stat_field({
+            name: "Congressional Seats",
+            value: stateMaster[st.properties.state].totalReps,
+            border_color: "gray"
+        })).appendTo("#stat_fields");
 
         /*
         $(stat_field({
@@ -253,6 +257,7 @@
             .attr("d", function(d) {
                 return path(topojson.merge(topology, d.values));
             });
+        calculateReps();
     }
 
     updateBorders();
@@ -303,6 +308,43 @@
         var avgMPE = mpe / totalPopulation;
         return avgMPE;
     }
+
+    function calculateReps(){
+        totalReps = 435; //Set by congress, removed 50 seats for each state
+        states = [];
+        stateArray = makeStates();
+        stateArray.forEach(function(data,index){
+            //Taxation without Representation!!!!
+            if(data.values.length > 0 && data.key != 11){
+                state = {};
+                state.key = data.key;
+                state.totalPopulation = getPop(data.key);
+                state.totalReps = 1;
+                state.priority = state.totalPopulation/(Math.sqrt(2)); //Calculate default quota
+                state.counties = data.values;
+                totalReps -= 1;
+                states.push(state);
+            }
+        });
+        var sortDesc = function(a, b){
+                return b.priority-a.priority;
+            };
+        for (totalReps; totalReps > 0; totalReps -= 1){
+            states.sort(sortDesc);
+            states[0].totalReps += 1;
+            //Huntington Hill method, assign seat and recalculate priority by population
+            states[0].priority = states[0].totalPopulation/Math.sqrt(states[0].totalReps * (states[0].totalReps + 1));
+        }
+        stateMaster = {};
+        states.forEach(function(data,index){
+            stateMaster[data.key] = data;
+        });
+        return stateMaster;
+        /*        d3.selectAll('.county').each(function(d,i){
+            console.log(d.key);
+        });*/
+    }
+    
 
     $("#saveme").click(function() {
         var output = {};
