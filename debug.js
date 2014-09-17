@@ -310,7 +310,7 @@
     }
 
     function calculateReps(){
-        totalReps = 435; //Set by congress, removed 50 seats for each state
+        totalReps = 435; //Set by congress
         states = [];
         stateArray = makeStates();
         stateArray.forEach(function(data,index){
