@@ -140,27 +140,6 @@
             border_color: "green"
         })).appendTo("#stat_fields");
 
-        /*
-        $(stat_field({
-            name: "GINI COEFF",
-            value: time.commafy(Math.round(getAvg(st.properties.state, "GINI") * 1000) / 1000),
-            border_color: "pink"
-        })).appendTo("#stat_fields");
-
-        $(stat_field({
-            name: "UNEMPLOYMENT",
-            value: time.commafy(Math.round((getSum(st.properties.state, "UNEMPRATE") / getSum(st.properties.state, "TOTALPOP")) * 100000) / 1000),
-            border_color: "pink"
-        })).appendTo("#stat_fields");
-
-        $(stat_field({
-            name: "POVERTY",
-            value: time.commafy(getSum(st.properties.state, "POVERTY")),
-            border_color: "pink"
-        })).appendTo("#stat_fields");
-
-        */
-
         $(stat_field({
             name: "ROMNEY",
             value: Math.round(100 * getSum(st.properties.state, "ROMNEY") / (getSum(st.properties.state, "OBAMA") + getSum(st.properties.state, "ROMNEY"))) + "%",
@@ -202,10 +181,16 @@
             value: Math.round(100 * getSum(st.properties.state, "NAPOP") / getPop(st.properties.state)) + "%",
             border_color: "gray"
         })).appendTo("#stat_fields");
+
         console.log(stateMaster[st.properties.state]);
         $(stat_field({
             name: "Congressional Seats",
             value: stateMaster[st.properties.state].totalReps,
+            border_color: "gray"
+        })).appendTo("#stat_fields");
+        $(stat_field({
+            name: "Senate",
+            value: calculateSenate(st.properties.state,1) + ' \n ' + calculateSenate(st.properties.state,2),
             border_color: "gray"
         })).appendTo("#stat_fields");
 
@@ -216,6 +201,24 @@
             border_color: "pink"
         })).appendTo("#stat_fields");
         */
+    }
+
+    function calculateSenate(state,seat){
+        console.log("s" + seat + "D");
+        console.log(getSum(state, "s" + seat + "D"));
+        var Democratic = getSum(state, "s" + seat + "D");
+        var Republican = getSum(state, "s" + seat + "R");
+        var total = Democratic + Republican;
+        var DemPct = Math.floor((Democratic/total)*100);
+        var RepPct = Math.floor((Republican/total)*100);
+        var winner = 0;
+        if(DemPct > RepPct){
+            winner = ' D:' + DemPct;
+        }
+        else {
+            winner = ' R:' + RepPct;
+        }
+        return 'S' + seat + winner;
     }
 
     function moveCounty(obj, county, new_state) {
@@ -340,9 +343,6 @@
             stateMaster[data.key] = data;
         });
         return stateMaster;
-        /*        d3.selectAll('.county').each(function(d,i){
-            console.log(d.key);
-        });*/
     }
     
 
