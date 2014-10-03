@@ -4,6 +4,9 @@
         d3 = require('d3'),
         topojson = require("topojson"),
         helper = require("./src/topojson.helper.js");
+    var zoom = d3.behavior.zoom()
+        .scaleExtent([1, 9])
+        .on("zoom", move);
 
     var stateMaster = {};
     countyData = require('./data/files/cleanedCounties.csv');
@@ -50,6 +53,8 @@
     var pressed = null, // which state we originally pressed
         justpressed = null, // weird thing where mouseup triggers mouseout
         next_state = 0; // for tracking new states
+
+    b.svg.call(zoom);
 
     // state borders, which go under the thinkly transparent boundaries for simplicity's sake
     b.svg.append("g").attr("class", "borders");
@@ -182,7 +187,6 @@
             border_color: "gray"
         })).appendTo("#stat_fields");
 
-        console.log(stateMaster[st.properties.state]);
         $(stat_field({
             name: "Congressional Seats",
             value: stateMaster[st.properties.state].totalReps,
@@ -190,7 +194,7 @@
         })).appendTo("#stat_fields");
         $(stat_field({
             name: "Senate",
-            value: calculateSenate(st.properties.state,1) + ' \n ' + calculateSenate(st.properties.state,2),
+            value: calculateSenate(st.properties.state, 1) + ' \n ' + calculateSenate(st.properties.state, 2),
             border_color: "gray"
         })).appendTo("#stat_fields");
 
@@ -203,19 +207,16 @@
         */
     }
 
-    function calculateSenate(state,seat){
-        console.log("s" + seat + "D");
-        console.log(getSum(state, "s" + seat + "D"));
+    function calculateSenate(state, seat) {
         var Democratic = getSum(state, "s" + seat + "D");
         var Republican = getSum(state, "s" + seat + "R");
         var total = Democratic + Republican;
-        var DemPct = Math.floor((Democratic/total)*100);
-        var RepPct = Math.floor((Republican/total)*100);
+        var DemPct = Math.floor((Democratic / total) * 100);
+        var RepPct = Math.floor((Republican / total) * 100);
         var winner = 0;
-        if(DemPct > RepPct){
+        if (DemPct > RepPct) {
             winner = ' D:' + DemPct;
-        }
-        else {
+        } else {
             winner = ' R:' + RepPct;
         }
         return 'S' + seat + winner;
@@ -238,6 +239,35 @@
                 return a - b;
             })
             .entries(topology.objects.counties.geometries);
+    }
+
+    function move() {
+    var shiftDown = event.shiftKey;
+    var mousedown = event.mousedown;
+    console.log(shiftDown,mousedown);
+    if(shiftDown){
+        var t = d3.event.translate;
+        var s = d3.event.scale;
+        zscale = s;
+        var height = $('#usmap').height();
+        var width = $('#usmap').width();
+        var h = height / 4;
+
+
+        t[0] = Math.min(
+            (width / height) * (s - 1),
+            Math.max(width * (1 - s), t[0])
+        );
+
+        t[1] = Math.min(
+            h * (s - 1) + h * s,
+            Math.max(height * (1 - s) - h * s, t[1])
+        );
+        console.log(s,t);
+        zoom.translate(t);
+        b.svg.selectAll('g').attr("transform", "translate(" + t + ")scale(" + s + ")");
+        //adjust the country hover stroke width based on zoom level
+    }
     }
 
     function updateBorders() {
@@ -299,7 +329,7 @@
     }
 
     function getWeightedAvg(state, prop) {
-        var totalPopulation = getSum(state,"TOTALPOP");
+        var totalPopulation = getSum(state, "TOTALPOP");
         var mpe = 0;
         var count = 0;
         counties.forEach(function(county) {
@@ -312,39 +342,39 @@
         return avgMPE;
     }
 
-    function calculateReps(){
+    function calculateReps() {
         totalReps = 435; //Set by congress
         states = [];
         stateArray = makeStates();
-        stateArray.forEach(function(data,index){
+        stateArray.forEach(function(data, index) {
             //Taxation without Representation!!!!
-            if(data.values.length > 0 && data.key != 11){
+            if (data.values.length > 0 && data.key != 11) {
                 state = {};
                 state.key = data.key;
                 state.totalPopulation = getPop(data.key);
                 state.totalReps = 1;
-                state.priority = state.totalPopulation/(Math.sqrt(2)); //Calculate default quota
+                state.priority = state.totalPopulation / (Math.sqrt(2)); //Calculate default quota
                 state.counties = data.values;
                 totalReps -= 1;
                 states.push(state);
             }
         });
-        var sortDesc = function(a, b){
-                return b.priority-a.priority;
-            };
-        for (totalReps; totalReps > 0; totalReps -= 1){
+        var sortDesc = function(a, b) {
+            return b.priority - a.priority;
+        };
+        for (totalReps; totalReps > 0; totalReps -= 1) {
             states.sort(sortDesc);
             states[0].totalReps += 1;
             //Huntington Hill method, assign seat and recalculate priority by population
-            states[0].priority = states[0].totalPopulation/Math.sqrt(states[0].totalReps * (states[0].totalReps + 1));
+            states[0].priority = states[0].totalPopulation / Math.sqrt(states[0].totalReps * (states[0].totalReps + 1));
         }
         stateMaster = {};
-        states.forEach(function(data,index){
+        states.forEach(function(data, index) {
             stateMaster[data.key] = data;
         });
         return stateMaster;
     }
-    
+
 
     $("#saveme").click(function() {
         var output = {};
